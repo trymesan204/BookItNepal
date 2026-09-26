@@ -1,0 +1,6 @@
+@BookItNepal_HostAddress = http://localhost:5066
+
+GET {{BookItNepal_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
