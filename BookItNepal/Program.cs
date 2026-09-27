@@ -9,6 +9,7 @@ using BookItNepal.Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using System.Text;
 
 namespace BookItNepal
@@ -21,7 +22,19 @@ namespace BookItNepal
 
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+            builder.Services.AddSwaggerGen(options =>
+            {
+                options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.Http,
+                    Scheme = JwtBearerDefaults.AuthenticationScheme,
+                    BearerFormat = "JWT",
+                    In = ParameterLocation.Header,
+                    Description = "Enter the JWT access token returned by login."
+                });
+                options.OperationFilter<AuthorizeOperationFilter>();
+            });
             builder.Services.AddDbContext<BookItDbContext>(options => options
                 .UseNpgsql(builder.Configuration.GetConnectionString("BookIt")
                     ?? builder.Configuration["Database:ConnectionString"])
