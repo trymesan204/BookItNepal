@@ -43,6 +43,7 @@ namespace BookItNepal
             builder.Services.AddScoped<IOrganizationContext, OrganizationContext>();
             builder.Services.AddScoped<IOrganizationRepository, OrganizationRepository>();
             builder.Services.AddScoped<IStaffRepository, StaffRepository>();
+            builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
             builder.Services.AddScoped<IServiceRepository, ServiceRepository>();
             builder.Services.AddScoped<IBookingRepository, BookingRepository>();
             builder.Services.AddScoped<IStaffService, StaffService>();
@@ -68,12 +69,40 @@ namespace BookItNepal
                 });
             builder.Services.AddAuthorization();
 
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowFrontend", policy =>
+                {
+                    policy.WithOrigins("http://localhost:3000")  // exact origin, no trailing slash, no wildcard
+                        .AllowAnyMethod()
+                        .AllowAnyHeader()
+                        .AllowCredentials();                     // required for cookies to work cross-origin
+                });
+            });
+
             var app = builder.Build();
+
+            app.UseCors("AllowFrontend");
 
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
                 app.UseSwaggerUI();
+            }
+
+            // Migrate latest database changes during startup
+            using (var scope = app.Services.CreateScope())
+            {
+                try
+                {
+                    var dbContext = scope.ServiceProvider
+                        .GetRequiredService<BookItDbContext>();
+                    dbContext.Database.MigrateAsync();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex);
+                }
             }
 
             app.UseHttpsRedirection();

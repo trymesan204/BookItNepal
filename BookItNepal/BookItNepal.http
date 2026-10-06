@@ -1,6 +1,17 @@
 @BookItNepal_HostAddress = http://localhost:5066
+@orgSlug = your-organization-slug
 
-GET {{BookItNepal_HostAddress}}/weatherforecast/
+POST {{BookItNepal_HostAddress}}/api/{{orgSlug}}/auth/login
+Content-Type: application/json
+
+{
+  "phoneNumber": "9800000000",
+  "password": "replace-with-password"
+}
+
+### Refresh the session using the refreshToken cookie from login
+POST {{BookItNepal_HostAddress}}/api/{{orgSlug}}/auth/refresh
 Accept: application/json
 
-###
+### Log out and revoke the refreshToken cookie
+POST {{BookItNepal_HostAddress}}/api/{{orgSlug}}/auth/logout

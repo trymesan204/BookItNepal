@@ -4,5 +4,6 @@ namespace BookIT.Application.Abstractions.Services;
 public interface ITokenService
 {
     string CreateToken(long userId, long organizationId, StaffType staffType);
+    string CreateRefreshToken();
+    string HashRefreshToken(string refreshToken);
 }
-

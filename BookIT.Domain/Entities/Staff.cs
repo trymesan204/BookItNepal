@@ -13,4 +13,5 @@ public class Staff
 
     public Organization Organization { get; set; } = null!;
     public ICollection<Booking> Bookings { get; set; } = [];
+    public ICollection<RefreshToken> RefreshTokens { get; set; } = [];
 }

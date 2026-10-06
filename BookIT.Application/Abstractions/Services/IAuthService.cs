@@ -4,6 +4,7 @@ namespace BookIT.Application.Abstractions.Services;
 
 public interface IAuthService
 {
-    Task<LoginResponseDTO?> LoginByPhoneNumberAsync(LoginDTO loginDto, CancellationToken cancellationToken);
+    Task<AuthSessionDTO?> LoginByPhoneNumberAsync(LoginDTO loginDto, CancellationToken cancellationToken);
+    Task<AuthSessionDTO?> RefreshAsync(string? refreshToken, CancellationToken cancellationToken);
+    Task LogoutAsync(string? refreshToken, CancellationToken cancellationToken);
 }
-

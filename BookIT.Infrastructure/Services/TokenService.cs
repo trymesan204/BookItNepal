@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace BookIT.Infrastructure.Services;
@@ -26,5 +27,15 @@ public sealed class TokenService(IConfiguration configuration) : ITokenService
             expires: DateTime.UtcNow.AddHours(8),
             signingCredentials: credentials);
         return new JwtSecurityTokenHandler().WriteToken(token);
+    }
+
+    public string CreateRefreshToken()
+    {
+        return Convert.ToHexString(RandomNumberGenerator.GetBytes(64));
+    }
+
+    public string HashRefreshToken(string refreshToken)
+    {
+        return Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(refreshToken)));
     }
 }

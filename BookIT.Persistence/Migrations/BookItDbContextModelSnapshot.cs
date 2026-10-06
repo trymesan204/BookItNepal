@@ -180,6 +180,46 @@ namespace BookIT.Persistence.Migrations
                     b.ToTable("organizations", (string)null);
                 });
 
+            modelBuilder.Entity("BookIT.Domain.Entities.RefreshToken", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTimeOffset>("ExpiresAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("expires_at");
+
+                    b.Property<DateTimeOffset?>("RevokedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("revoked_at");
+
+                    b.Property<long>("StaffId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("staff_id");
+
+                    b.Property<string>("TokenHash")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)")
+                        .HasColumnName("token_hash");
+
+                    b.HasKey("Id")
+                        .HasName("pk_refresh_token");
+
+                    b.HasIndex("StaffId")
+                        .HasDatabaseName("ix_refresh_token_staff_id");
+
+                    b.HasIndex("TokenHash")
+                        .IsUnique()
+                        .HasDatabaseName("ix_refresh_token_token_hash");
+
+                    b.ToTable("refresh_token", (string)null);
+                });
+
             modelBuilder.Entity("BookIT.Domain.Entities.Service", b =>
                 {
                     b.Property<long>("Id")
@@ -352,6 +392,18 @@ namespace BookIT.Persistence.Migrations
                     b.Navigation("Organization");
                 });
 
+            modelBuilder.Entity("BookIT.Domain.Entities.RefreshToken", b =>
+                {
+                    b.HasOne("BookIT.Domain.Entities.Staff", "Staff")
+                        .WithMany("RefreshTokens")
+                        .HasForeignKey("StaffId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_refresh_token_staff_staff_id");
+
+                    b.Navigation("Staff");
+                });
+
             modelBuilder.Entity("BookIT.Domain.Entities.Service", b =>
                 {
                     b.HasOne("BookIT.Domain.Entities.Organization", "Organization")
@@ -414,6 +466,8 @@ namespace BookIT.Persistence.Migrations
             modelBuilder.Entity("BookIT.Domain.Entities.Staff", b =>
                 {
                     b.Navigation("Bookings");
+
+                    b.Navigation("RefreshTokens");
                 });
 #pragma warning restore 612, 618
         }
